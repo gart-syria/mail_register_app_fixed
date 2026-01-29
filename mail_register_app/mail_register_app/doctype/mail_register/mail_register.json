@@ -1,0 +1,210 @@
+{
+ "actions": [],
+ "autoname": "prompt",
+ "creation": "2026-01-29 09:05:34.188012",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mail_type",
+  "from_external_entity",
+  "issuing_external_entity",
+  "issuing_office",
+  "mail_number",
+  "mail_date",
+  "subject",
+  "summary",
+  "recipients",
+  "external_recipients",
+  "requires_reply",
+  "receiver_office",
+  "received_date",
+  "linked_outgoing_mail",
+  "reply_to",
+  "status",
+  "attachments",
+  "notes",
+  "linked_central_number",
+  "direction",
+  "has_internal_recipients",
+  "root_outgoing_mail",
+  "signature_bxcs"
+ ],
+ "fields": [
+  {
+   "default": "Outgoing",
+   "fieldname": "mail_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Mail Type",
+   "options": "Outgoing\nIncoming"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.mail_type==\"Incoming\"",
+   "fieldname": "from_external_entity",
+   "fieldtype": "Check",
+   "label": "From External Entity"
+  },
+  {
+   "depends_on": "eval:doc.from_external_entity==1",
+   "fieldname": "issuing_external_entity",
+   "fieldtype": "Link",
+   "label": "Issuing External Entity",
+   "options": "External Entity"
+  },
+  {
+   "depends_on": "eval:doc.from_external_entity==0",
+   "fieldname": "issuing_office",
+   "fieldtype": "Link",
+   "label": "Issuing Office",
+   "options": "Diwan",
+   "reqd": 1
+  },
+  {
+   "fieldname": "mail_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Mail Number",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "mail_date",
+   "fieldtype": "Date",
+   "label": "Mail Date"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject"
+  },
+  {
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Summary"
+  },
+  {
+   "depends_on": "eval:doc.mail_type==\"Outgoing\"",
+   "fieldname": "recipients",
+   "fieldtype": "Table",
+   "label": "Recipients",
+   "options": "Mail Recipients"
+  },
+  {
+   "depends_on": "eval:doc.mail_type==\"Outgoing\"",
+   "fieldname": "external_recipients",
+   "fieldtype": "Table",
+   "label": "External Recipients",
+   "options": "Mail External Recipients"
+  },
+  {
+   "default": "0",
+   "fieldname": "requires_reply",
+   "fieldtype": "Check",
+   "label": "Requires Reply"
+  },
+  {
+   "depends_on": "eval:doc.mail_type==\"Incoming\"",
+   "fieldname": "receiver_office",
+   "fieldtype": "Link",
+   "label": "Receiver Office",
+   "options": "Diwan"
+  },
+  {
+   "depends_on": "eval:doc.mail_type==\"Incoming\"",
+   "fieldname": "received_date",
+   "fieldtype": "Date",
+   "label": "Received Date"
+  },
+  {
+   "depends_on": "eval:doc.mail_type==\"Incoming\"",
+   "fieldname": "linked_outgoing_mail",
+   "fieldtype": "Link",
+   "label": "Linked Outgoing Mail",
+   "options": "Mail Register"
+  },
+  {
+   "depends_on": "eval:doc.from_external_entity==0",
+   "fieldname": "reply_to",
+   "fieldtype": "Link",
+   "label": "Reply To",
+   "options": "Mail Register"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nSent\nReceived"
+  },
+  {
+   "fieldname": "attachments",
+   "fieldtype": "Attach",
+   "label": "Attachments"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "linked_central_number",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Linked Central Number"
+  },
+  {
+   "fieldname": "direction",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Direction",
+   "options": "Incoming\nOutgoing"
+  },
+  {
+   "default": "0",
+   "fieldname": "has_internal_recipients",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Has Internal Recipients",
+   "read_only": 1
+  },
+  {
+   "fieldname": "root_outgoing_mail",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Root Outgoing Mail",
+   "options": "Mail Register",
+   "read_only": 1
+  },
+  {
+   "fieldname": "signature_bxcs",
+   "fieldtype": "Signature"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-29 09:08:14.052976",
+ "modified_by": "Administrator",
+ "module": "Mail Register App",
+ "name": "Mail Register",
+ "naming_rule": "Set by user",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

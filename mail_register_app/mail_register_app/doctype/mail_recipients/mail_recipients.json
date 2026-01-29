@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-29 09:05:34.384857",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "created_incoming_mail",
+  "recipient_office",
+  "forwarded_date",
+  "received_confirmed",
+  "received_date",
+  "notes",
+  "status",
+  "notification_sent"
+ ],
+ "fields": [
+  {
+   "fieldname": "created_incoming_mail",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Created Incoming Mail",
+   "options": "Mail Register"
+  },
+  {
+   "fieldname": "recipient_office",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Recipient Office",
+   "options": "Diwan"
+  },
+  {
+   "fieldname": "forwarded_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Forwarded Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "received_confirmed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Received Confirmed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "received_date",
+   "fieldtype": "Date",
+   "label": "Received Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes",
+   "read_only": 1
+  },
+  {
+   "default": "Sent",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nSent\nReceived\nClosed",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "notification_sent",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Notification Sent",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-29 09:08:13.708963",
+ "modified_by": "Administrator",
+ "module": "Mail Register App",
+ "name": "Mail Recipients",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

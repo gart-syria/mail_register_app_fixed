@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-29 09:05:33.996281",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mail_register",
+  "recipient_office",
+  "status",
+  "received_confirmed",
+  "mail_recipient_row",
+  "mail_number",
+  "mail_date",
+  "subject",
+  "confirmed_by",
+  "confirmed_on"
+ ],
+ "fields": [
+  {
+   "fieldname": "mail_register",
+   "fieldtype": "Link",
+   "label": "Mail Register",
+   "options": "Mail Register"
+  },
+  {
+   "fieldname": "recipient_office",
+   "fieldtype": "Link",
+   "label": "Recipient Office",
+   "options": "Diwan"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Sent\nReceived"
+  },
+  {
+   "default": "0",
+   "fieldname": "received_confirmed",
+   "fieldtype": "Check",
+   "label": "Received Confirmed"
+  },
+  {
+   "fieldname": "mail_recipient_row",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Mail Recipient Row",
+   "options": "Mail Recipients"
+  },
+  {
+   "fieldname": "mail_number",
+   "fieldtype": "Data",
+   "label": "Mail Number"
+  },
+  {
+   "fieldname": "mail_date",
+   "fieldtype": "Date",
+   "label": "Mail Date"
+  },
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "label": "Subject"
+  },
+  {
+   "fieldname": "confirmed_by",
+   "fieldtype": "Link",
+   "label": "Confirmed By",
+   "options": "User"
+  },
+  {
+   "fieldname": "confirmed_on",
+   "fieldtype": "Datetime",
+   "label": "Confirmed On"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-29 09:08:14.427715",
+ "modified_by": "Administrator",
+ "module": "Mail Register App",
+ "name": "Incoming Confirmation Queue",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

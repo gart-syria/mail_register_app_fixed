@@ -1,0 +1,88 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-29 09:05:34.062673",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "mail_register",
+  "annotation_text",
+  "created_by",
+  "visibility",
+  "related_recipient",
+  "version",
+  "is_current"
+ ],
+ "fields": [
+  {
+   "fieldname": "mail_register",
+   "fieldtype": "Link",
+   "label": "Mail Register",
+   "options": "Mail Register"
+  },
+  {
+   "fieldname": "annotation_text",
+   "fieldtype": "Text",
+   "label": "Annotation Text"
+  },
+  {
+   "fieldname": "created_by",
+   "fieldtype": "Link",
+   "label": "Created By",
+   "options": "User"
+  },
+  {
+   "default": "Internal",
+   "fieldname": "visibility",
+   "fieldtype": "Select",
+   "label": "Visibility",
+   "options": "Internal\nSender\nBoth"
+  },
+  {
+   "fieldname": "related_recipient",
+   "fieldtype": "Link",
+   "label": "Recipient Office",
+   "options": "Diwan"
+  },
+  {
+   "depends_on": "1",
+   "fieldname": "version",
+   "fieldtype": "Int",
+   "label": "Version"
+  },
+  {
+   "default": "0",
+   "depends_on": "1",
+   "fieldname": "is_current",
+   "fieldtype": "Check",
+   "label": "Is Current"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-29 09:08:14.322745",
+ "modified_by": "Administrator",
+ "module": "Mail Register App",
+ "name": "Mail Annotation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
