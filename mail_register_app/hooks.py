@@ -5,6 +5,8 @@ app_description = "For Diwan"
 app_email = "it@ortas.online"
 app_license = "mit"
 
+#after_install = "mail_register_app.setup.install.after_install"
+
 
 fixtures = [
     # Role
@@ -211,9 +213,10 @@ fixtures = [
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"Mail Register": "mail_register_app.mail_register_app.utils.permission_query_conditions.filter_mails_according_to_user",
+	"Incoming Confirmation Queue": "mail_register_app.mail_register_app.utils.permission_query_conditions.filter_waiting_mails_according_to_user",
+}
 #
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
