@@ -7,9 +7,9 @@ For Diwan
 You can install this app using the [bench](https://github.com/frappe/bench) CLI:
 
 ```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
-bench install-app mail_register_app
+cd $PATH_TO_YOUR_BENCH/frappe-bench
+bench get-app https://github.com/gart-syria/mail_register_app_fixed.git --branch develop
+bench --site [your site] install-app mail_register_app
 ```
 
 ### Contributing
