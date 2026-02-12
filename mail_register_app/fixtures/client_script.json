@@ -1,0 +1,79 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Mail Register",
+  "enabled": 1,
+  "modified": "2026-01-18 09:36:01.330620",
+  "module": "Mail Register App",
+  "name": "Auto Select for Issuing Receiving office if inbox from external entity",
+  "script": "frappe.ui.form.on(\"Mail Register\", {\n    from_external_entity(frm) {\n        if (frm.doc.from_external_entity) {\n\n            // جلب الديوان المركزي\n            frappe.db.get_value(\n                \"Diwan\",\n                { \"name1\": \"الديوان المركزي\" },\n                \"name\"\n            ).then(r => {\n                if (r && r.message && r.message.name) {\n                    frm.set_value(\"receiver_office\", r.message.name);\n\n                    // ✅ تعيين الحالة مباشرة إلى Received\n                    frm.set_value(\"status\", \"Received\");\n                } else {\n                    frappe.msgprint(\n                        \"⚠️ لم يتم العثور على ديوان باسم 'الديوان المركزي' في الحقل name1\"\n                    );\n                }\n            });\n\n            // تعبئة تاريخ الاستلام\n            const today = frappe.datetime.now_date();\n            frm.set_value(\"received_date\", today);\n\n            frappe.show_alert({\n                message: \"📩 بريد وارد من جهة خارجية — تم تعيين الحالة إلى Received\",\n                indicator: \"green\"\n            });\n\n        } else {\n            // في حال إلغاء التفعيل\n            frm.set_value(\"receiver_office\", \"\");\n            frm.set_value(\"received_date\", \"\");\n            frm.set_value(\"status\", \"Draft\"); // أو الحالة الافتراضية عندك\n        }\n    }\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Incoming Confirmation Queue",
+  "enabled": 1,
+  "modified": "2026-01-20 10:55:24.475573",
+  "module": "Mail Register App",
+  "name": "Updated Auto Compose Inbox When Recieving Mail",
+  "script": "frappe.ui.form.on('Incoming Confirmation Queue', {\n    received_confirmed(frm) {\n\n        if (!frm.doc.received_confirmed) {\n            return;\n        }\n\n        frappe.confirm(\n            __('هل تريد تأكيد استلام هذا البريد وإنشاء بريد وارد؟'),\n            () => {\n                frappe.call({\n                    method: \"mail_register_app.api.confirm_received\",\n                    args: {\n                        queue_name: frm.doc.name\n                    },\n                    callback: function(r) {\n                        if (r.message) {\n                            frappe.show_alert({\n                                message: \"✅ تم تأكيد الاستلام وإنشاء البريد الوارد\",\n                                indicator: \"green\"\n                            });\n\n                            frm.reload_doc();\n                        }\n                    }\n                });\n            },\n            () => {\n                frm.set_value(\"received_confirmed\", 0);\n            }\n        );\n    }\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Mail Register",
+  "enabled": 1,
+  "modified": "2026-01-12 11:00:07.067365",
+  "module": "Mail Register App",
+  "name": "Button For Adding Notes To Mail",
+  "script": "frappe.ui.form.on(\"Mail Register\", {\n    refresh: function (frm) {\n\n        if (frm.doc.mail_type === \"Incoming\" && frm.doc.__islocal !== 1) {\n\n            frm.add_custom_button(\n                __(\"إضافة حاشية\"),\n                function () {\n                    frappe.new_doc(\"Mail Annotation\", {\n                        mail_register: frm.doc.name\n                    });\n                },\n                __(\"إجراءات\")\n            );\n        }\n    }\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Mail Register",
+  "enabled": 1,
+  "modified": "2026-01-20 08:40:14.240218",
+  "module": "Mail Register App",
+  "name": "Button For Adding Replay To Mail",
+  "script": "frappe.ui.form.on(\"Mail Register\", {\n    refresh(frm) {\n\n        if (\n            frm.doc.mail_type === \"Incoming\" &&\n            frm.doc.__islocal !== 1\n        ) {\n            frm.add_custom_button(\n                __(\"الرد بكتاب صادر\"),\n                function () {\n                    create_reply_outgoing(frm);\n                },\n                __(\"إجراءات\")\n            );\n        }\n    }\n});\n\nfunction create_reply_outgoing(frm) {\n\n    frappe.confirm(\n        \"هل تريد إنشاء كتاب صادر ردًا على هذا البريد؟\",\n        () => {\n            frappe.new_doc(\"Mail Register\", {\n                mail_type: \"Outgoing\",\n                direction: \"Outgoing\",\n                reply_to: frm.doc.name,\n                subject: \"رد على: \" + (frm.doc.subject || \"\"),\n                issuing_office: frm.doc.receiver_office,\n                mail_date: frappe.datetime.now_date()\n            });\n        }\n    );\n}\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Mail Register",
+  "enabled": 1,
+  "modified": "2026-01-15 10:12:17.167758",
+  "module": "Mail Register App",
+  "name": "Button To Show Replays",
+  "script": "frappe.ui.form.on(\"Mail Register\", {\n    refresh(frm) {\n\n        // لا نعرض الزر للمستند الجديد\n        if (frm.doc.__islocal === 1) return;\n\n        frm.add_custom_button(\n            __(\"عرض الردود\"),\n            function () {\n                show_replies(frm);\n            },\n            __(\"إجراءات\")\n        );\n    }\n});\n\nfunction show_replies(frm) {\n\n    // 📥 إذا كان البريد وارد\n    // نعرض الصادر الذي تم به الرد عليه\n    if (frm.doc.mail_type === \"Incoming\") {\n\n        frappe.route_options = {\n            reply_to: frm.doc.name\n        };\n\n        frappe.set_route(\"List\", \"Mail Register\");\n        return;\n    }\n\n    // 📤 إذا كان البريد صادر\n    // نعرض الواردات التي جاءت كرد عليه\n    if (frm.doc.mail_type === \"Outgoing\") {\n\n        frappe.route_options = {\n            mail_type: \"Incoming\",\n            root_outgoing_mail: frm.doc.name\n        };\n\n        frappe.set_route(\"List\", \"Mail Register\");\n        return;\n    }\n}\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Mail Register",
+  "enabled": 1,
+  "modified": "2026-02-02 08:22:15.953878",
+  "module": "Mail Register App",
+  "name": "Auto Fill Issusing Office",
+  "script": "frappe.ui.form.on(\"Mail Register\", {\n    onload(frm) {\n\n        const is_system_manager = frappe.user.has_role(\"System Manager\");\n\n        // 🔹 تحديد خيارات الجهة المرسلة\n        frm.set_query(\"issuing_office\", function () {\n\n            // 👑 System Manager يرى كل الدواوين\n            if (is_system_manager) {\n                return {\n                    doctype: \"Diwan\"\n                };\n            }\n\n            // 👤 المستخدم العادي يرى ديوانه فقط\n            return {\n                query: \"frappe.db.get_list\",\n                filters: {\n                    doctype: \"User Diwan Mapping\",\n                    user: frappe.session.user\n                }\n            };\n        });\n\n        // 🔹 تعبئة تلقائية فقط للمستخدم العادي\n        if (\n            !is_system_manager &&\n            frm.doc.__islocal === 1 &&\n            !frm.doc.issuing_office\n        ) {\n            frappe.call({\n                method: \"frappe.client.get_value\",\n                args: {\n                    doctype: \"User Diwan Mapping\",\n                    filters: {\n                        user: frappe.session.user\n                    },\n                    fieldname: \"diwan\"\n                },\n                callback: function (r) {\n                    if (r.message && r.message.diwan) {\n                        frm.set_value(\"issuing_office\", r.message.diwan);\n                    }\n                }\n            });\n        }\n    },\n\n    refresh(frm) {\n        const is_system_manager = frappe.user.has_role(\"System Manager\");\n\n        // 🔹 منع التعديل بعد الحفظ (إلا للـ System Manager)\n        if (frm.doc.__islocal !== 1 && !is_system_manager) {\n            frm.set_df_property(\"issuing_office\", \"read_only\", 1);\n        }\n    }\n});\n\nfrappe.ui.form.on(\"Mail Register\", {\n    validate(frm) {\n\n        const is_system_manager = frappe.user.has_role(\"System Manager\");\n\n        // 🔹 لا نُجبر System Manager\n        if (is_system_manager) {\n            return;\n        }\n\n        // 🔹 حماية للمستخدم العادي\n        if (!frm.doc.issuing_office) {\n            frappe.call({\n                method: \"frappe.client.get_value\",\n                args: {\n                    doctype: \"User Diwan Mapping\",\n                    filters: {\n                        user: frappe.session.user\n                    },\n                    fieldname: \"diwan\"\n                },\n                callback: function (r) {\n                    if (r.message && r.message.diwan) {\n                        frm.set_value(\"issuing_office\", r.message.diwan);\n                    } else {\n                        frappe.throw(__(\"لا يوجد ديوان مرتبط بهذا المستخدم\"));\n                    }\n                }\n            });\n        }\n    }\n});\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Mail Register",
+  "enabled": 1,
+  "modified": "2026-02-11 10:24:01.288909",
+  "module": "Mail Register App",
+  "name": "Timeline to Show Mail Annotaions",
+  "script": "frappe.ui.form.on(\"Mail Register\", {\n    refresh(frm) {\n\n        if (frm.doc.__islocal || !frm.doc.root_outgoing_mail) {\n            if (frm.fields_dict.annotations_timeline) {\n                frm.fields_dict.annotations_timeline.$wrapper.html(\"\");\n            }\n            return;\n        }\n\n        inject_timeline_css();\n        load_annotations_timeline(frm);\n    }\n});\n\n\nfunction load_annotations_timeline(frm) {\n\n    if (!frm.fields_dict.annotations_timeline) return;\n\n    frappe.call({\n        method: \"frappe.client.get_list\",\n        args: {\n            doctype: \"Mail Annotation\",\n            filters: {\n                root_outgoing_mail: frm.doc.root_outgoing_mail\n            },\n            fields: [\n                \"annotation_text\",\n                \"annotation_date\",\n                \"created_by\",\n                \"diwan\"\n            ],\n            order_by: \"annotation_date asc\"\n        },\n        callback: function (r) {\n\n            if (!r.message || r.message.length === 0) {\n                frm.fields_dict.annotations_timeline.$wrapper.html(\n                    `<div style=\"padding:15px;color:gray\">\n                        لا توجد حواشي مرتبطة بهذا البريد\n                    </div>`\n                );\n                return;\n            }\n\n            // جلب ألوان الدواوين دفعة واحدة\n            const diwan_names = [...new Set(r.message.map(row => row.diwan).filter(Boolean))];\n\n            frappe.call({\n                method: \"frappe.client.get_list\",\n                args: {\n                    doctype: \"Diwan\",\n                    filters: {\n                        name: [\"in\", diwan_names]\n                    },\n                    fields: [\"name\", \"color\"]\n                },\n                callback: function(color_res) {\n\n                    const diwan_colors = {};\n                    (color_res.message || []).forEach(d => {\n                        diwan_colors[d.name] = d.color || \"#607D8B\";\n                    });\n\n                    let html = `<div class=\"timeline-container\">`;\n\n                    r.message.forEach(row => {\n\n                        const color = diwan_colors[row.diwan] || \"#607D8B\";\n\n                        html += `\n                            <div class=\"timeline-item\">\n                                <div class=\"timeline-dot\" style=\"background:${color};\"></div>\n                                <div class=\"timeline-content\" style=\"border-right:4px solid ${color};\">\n                                    <div class=\"timeline-header\">\n                                        <div>\n                                            <strong>${row.diwan || \"\"}</strong>\n                                            <span style=\"color:#777;font-size:12px\">\n                                                — ${row.created_by || \"\"}\n                                            </span>\n                                        </div>\n                                        <span class=\"timeline-date\">\n                                            ${row.annotation_date ? frappe.datetime.str_to_user(row.annotation_date) : \"\"}\n                                        </span>\n                                    </div>\n                                    <div class=\"timeline-body\">\n                                        ${frappe.utils.escape_html(row.annotation_text || \"\").replace(/\\n/g, \"<br>\")}\n                                    </div>\n                                </div>\n                            </div>\n                        `;\n                    });\n\n                    html += `</div>`;\n\n                    frm.fields_dict.annotations_timeline.$wrapper.html(html);\n                }\n            });\n        }\n    });\n}\n\n\n\nfunction inject_timeline_css() {\n\n    if (document.getElementById(\"annotation-timeline-style\")) return;\n\n    const style = document.createElement(\"style\");\n    style.id = \"annotation-timeline-style\";\n\n    style.innerHTML = `\n        .timeline-container {\n            position: relative;\n            margin: 20px 0;\n            padding-left: 30px;\n            border-left: 2px solid #d1d8dd;\n        }\n\n        .timeline-item {\n            position: relative;\n            margin-bottom: 20px;\n        }\n\n        .timeline-dot {\n            position: absolute;\n            left: -9px;\n            top: 5px;\n            width: 14px;\n            height: 14px;\n            background: #4caf50;\n            border-radius: 50%;\n        }\n\n        .timeline-content {\n            background: #f9fafb;\n            padding: 12px 15px;\n            border-radius: 8px;\n            box-shadow: 0 1px 3px rgba(0,0,0,0.05);\n        }\n\n        .timeline-header {\n            display: flex;\n            justify-content: space-between;\n            font-size: 13px;\n            margin-bottom: 6px;\n            color: #555;\n        }\n\n        .timeline-date {\n            font-size: 12px;\n            color: #888;\n        }\n\n        .timeline-body {\n            font-size: 14px;\n            color: #333;\n        }\n    `;\n\n    document.head.appendChild(style);\n}\n",
+  "view": "Form"
+ }
+]

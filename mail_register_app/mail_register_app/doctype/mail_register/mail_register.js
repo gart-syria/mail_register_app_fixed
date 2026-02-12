@@ -1,116 +1,116 @@
 // Copyright (c) 2026, GARTSYRIA and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("Mail Register", {
-	onload(frm) {
-		// Auto Fill Issuing Office - تحديد خيارات الجهة المرسلة حسب المستخدم
-		frm.set_query("issuing_office", function () {
-			return {
-				query: "frappe.db.get_list",
-				filters: {
-					doctype: "User Diwan Mapping",
-					user: frappe.session.user
-				}
-			};
-		});
+// frappe.ui.form.on("Mail Register", {
+// 	onload(frm) {
+// 		// Auto Fill Issuing Office - تحديد خيارات الجهة المرسلة حسب المستخدم
+// 		frm.set_query("issuing_office", function () {
+// 			return {
+// 				query: "frappe.db.get_list",
+// 				filters: {
+// 					doctype: "User Diwan Mapping",
+// 					user: frappe.session.user
+// 				}
+// 			};
+// 		});
 
-		if (frm.doc.__islocal === 1 && !frm.doc.issuing_office) {
-			frappe.call({
-				method: "frappe.client.get_value",
-				args: {
-					doctype: "User Diwan Mapping",
-					filters: { user: frappe.session.user },
-					fieldname: "diwan"
-				},
-				callback: function (r) {
-					if (r.message && r.message.diwan) {
-						frm.set_value("issuing_office", r.message.diwan);
-					}
-				}
-			});
-		}
-	},
+// 		if (frm.doc.__islocal === 1 && !frm.doc.issuing_office) {
+// 			frappe.call({
+// 				method: "frappe.client.get_value",
+// 				args: {
+// 					doctype: "User Diwan Mapping",
+// 					filters: { user: frappe.session.user },
+// 					fieldname: "diwan"
+// 				},
+// 				callback: function (r) {
+// 					if (r.message && r.message.diwan) {
+// 						frm.set_value("issuing_office", r.message.diwan);
+// 					}
+// 				}
+// 			});
+// 		}
+// 	},
 
-	refresh(frm) {
-		if (frm.doc.__islocal !== 1) {
-			frm.set_df_property("issuing_office", "read_only", 1);
-		}
+// 	refresh(frm) {
+// 		if (frm.doc.__islocal !== 1) {
+// 			frm.set_df_property("issuing_office", "read_only", 1);
+// 		}
 
-		update_status_based_on_recipients(frm);
+// 		update_status_based_on_recipients(frm);
 
-		if (frm.doc.mail_type === "Incoming" && frm.doc.__islocal !== 1) {
-			frm.add_custom_button(
-				__("إضافة حاشية"),
-				function () {
-					frappe.new_doc("Mail Annotation", { mail_register: frm.doc.name });
-				},
-				__("إجراءات")
-			);
-			frm.add_custom_button(
-				__("الرد بكتاب صادر"),
-				function () {
-					create_reply_outgoing(frm);
-				},
-				__("إجراءات")
-			);
-		}
+// 		if (frm.doc.mail_type === "Incoming" && frm.doc.__islocal !== 1) {
+// 			frm.add_custom_button(
+// 				__("إضافة حاشية"),
+// 				function () {
+// 					frappe.new_doc("Mail Annotation", { mail_register: frm.doc.name });
+// 				},
+// 				__("إجراءات")
+// 			);
+// 			frm.add_custom_button(
+// 				__("الرد بكتاب صادر"),
+// 				function () {
+// 					create_reply_outgoing(frm);
+// 				},
+// 				__("إجراءات")
+// 			);
+// 		}
 
-		if (frm.doc.__islocal !== 1) {
-			frm.add_custom_button(
-				__("عرض الردود"),
-				function () { show_replies(frm); },
-				__("إجراءات")
-			);
-		}
-	},
+// 		if (frm.doc.__islocal !== 1) {
+// 			frm.add_custom_button(
+// 				__("عرض الردود"),
+// 				function () { show_replies(frm); },
+// 				__("إجراءات")
+// 			);
+// 		}
+// 	},
 
-	from_external_entity(frm) {
-		if (frm.doc.from_external_entity) {
-			frappe.db.get_value("Diwan", { name1: "الديوان المركزي" }, "name").then((r) => {
-				if (r && r.message && r.message.name) {
-					frm.set_value("receiver_office", r.message.name);
-					frm.set_value("status", "Received");
-				} else {
-					frappe.msgprint("⚠️ لم يتم العثور على ديوان باسم 'الديوان المركزي' في الحقل name1");
-				}
-			});
-			frm.set_value("received_date", frappe.datetime.now_date());
-			frappe.show_alert({
-				message: "📩 بريد وارد من جهة خارجية — تم تعيين الحالة إلى Received",
-				indicator: "green"
-			});
-		} else {
-			frm.set_value("receiver_office", "");
-			frm.set_value("received_date", "");
-			frm.set_value("status", "Draft");
-		}
-	},
+// 	from_external_entity(frm) {
+// 		if (frm.doc.from_external_entity) {
+// 			frappe.db.get_value("Diwan", { name1: "الديوان المركزي" }, "name").then((r) => {
+// 				if (r && r.message && r.message.name) {
+// 					frm.set_value("receiver_office", r.message.name);
+// 					frm.set_value("status", "Received");
+// 				} else {
+// 					frappe.msgprint("⚠️ لم يتم العثور على ديوان باسم 'الديوان المركزي' في الحقل name1");
+// 				}
+// 			});
+// 			frm.set_value("received_date", frappe.datetime.now_date());
+// 			frappe.show_alert({
+// 				message: "📩 بريد وارد من جهة خارجية — تم تعيين الحالة إلى Received",
+// 				indicator: "green"
+// 			});
+// 		} else {
+// 			frm.set_value("receiver_office", "");
+// 			frm.set_value("received_date", "");
+// 			frm.set_value("status", "Draft");
+// 		}
+// 	},
 
-	recipients_add(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
-	recipients_remove(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
-	external_recipients_add(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
-	external_recipients_remove(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
+// 	recipients_add(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
+// 	recipients_remove(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
+// 	external_recipients_add(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
+// 	external_recipients_remove(frm, cdt, cdn) { update_status_based_on_recipients(frm); },
 
-	validate(frm) {
-		if (!frm.doc.issuing_office) {
-			frappe.call({
-				method: "frappe.client.get_value",
-				args: {
-					doctype: "User Diwan Mapping",
-					filters: { user: frappe.session.user },
-					fieldname: "diwan"
-				},
-				callback: function (r) {
-					if (r.message && r.message.diwan) {
-						frm.set_value("issuing_office", r.message.diwan);
-					} else {
-						frappe.throw(__("لا يوجد ديوان مرتبط بهذا المستخدم"));
-					}
-				}
-			});
-		}
-	}
-});
+// 	validate(frm) {
+// 		if (!frm.doc.issuing_office) {
+// 			frappe.call({
+// 				method: "frappe.client.get_value",
+// 				args: {
+// 					doctype: "User Diwan Mapping",
+// 					filters: { user: frappe.session.user },
+// 					fieldname: "diwan"
+// 				},
+// 				callback: function (r) {
+// 					if (r.message && r.message.diwan) {
+// 						frm.set_value("issuing_office", r.message.diwan);
+// 					} else {
+// 						frappe.throw(__("لا يوجد ديوان مرتبط بهذا المستخدم"));
+// 					}
+// 				}
+// 			});
+// 		}
+// 	}
+// });
 
 function update_status_based_on_recipients(frm) {
 	if (frm.doc.status === "Received") return;
